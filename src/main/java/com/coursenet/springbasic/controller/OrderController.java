@@ -23,8 +23,7 @@ public class OrderController {
 	
 	@PostMapping("/orders")
 	public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequest){
-		System.out.println(orderRequest.getGoodsName() + orderRequest.getReceiverAddress() + orderRequest.getReceiverName());
-		
+		log.info(orderRequest.toString());
 		return orderService.createOrder(orderRequest);
 	}
 	
