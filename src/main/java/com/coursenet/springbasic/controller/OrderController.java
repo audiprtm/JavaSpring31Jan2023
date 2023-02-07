@@ -5,11 +5,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.coursenet.springbasic.dto.OrderRequestDTO;
 import com.coursenet.springbasic.dto.OrderResponseDTO;
@@ -34,5 +30,17 @@ public class OrderController {
 			){
 		return orderService.getOrder(id,name);
 	}
-	
+
+	@PutMapping("/orders/{id}")
+	public ResponseEntity<OrderResponseDTO> putOrders(
+			@PathVariable(value="id") Long id,
+			@RequestBody OrderRequestDTO orderRequestDTO
+	){
+		return orderService.putOrder(id,orderRequestDTO);
+	}
+
+	@DeleteMapping("/orders/{id}")
+	public ResponseEntity<OrderResponseDTO> deleteOrder(@PathVariable(value="id") Long id){
+		return orderService.deleteOrder(id);
+	}
 }
