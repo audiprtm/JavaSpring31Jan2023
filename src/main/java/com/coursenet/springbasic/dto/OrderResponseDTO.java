@@ -19,8 +19,4 @@ public class OrderResponseDTO {
 	private String goodsName;
 	private String receiverName;
 	private String receiverAddress;
-
-	public OrderResponseDTO() {
-
-	}
 }
