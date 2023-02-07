@@ -11,6 +11,10 @@ public class OrderResponseDTO {
 		this.receiverName = order.getReceiverName();
 		this.receiverAddress = order.getReceiverAddress();
 	}
+
+	public OrderResponseDTO() {
+
+	}
 	
 	private String goodsName;
 	private String receiverName;
