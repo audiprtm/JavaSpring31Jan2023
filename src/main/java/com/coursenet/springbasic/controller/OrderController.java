@@ -26,10 +26,10 @@ public class OrderController {
 	@GetMapping("/orders")
 	public ResponseEntity<List<OrderResponseDTO>> getOrders(
 			@RequestParam(value="id", required=false) Long id,
-			@RequestParam(value="name", required=false) String name
+			@RequestParam(value="goodsName", required=false) String goodsName,
+			@RequestParam(value="receiverName", required=false) String receiverName
 			){
-		return orderService.getOrder(id,name);
-
+		return orderService.getOrder(id,goodsName,receiverName);
 	}
 
 	@PutMapping("/orders/{id}")

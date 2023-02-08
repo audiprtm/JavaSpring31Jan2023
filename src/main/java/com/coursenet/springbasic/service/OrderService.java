@@ -1,11 +1,8 @@
 package com.coursenet.springbasic.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import org.aspectj.weaver.ast.Or;
-import org.hibernate.criterion.Order;
+import com.coursenet.springbasic.repository.OrderRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +17,9 @@ import com.coursenet.springbasic.repository.OrderRepository;
 public class OrderService {
 	@Autowired
 	private OrderRepository orderRepository;
+
+	@Autowired
+	private OrderRepositoryCustom orderRepositoryCustom;
 	
 	public ResponseEntity<OrderResponseDTO> createOrder(OrderRequestDTO orderRequest) {
 		Orders order = new Orders();
@@ -34,35 +34,57 @@ public class OrderService {
 		return new ResponseEntity<>(orderResponse, HttpStatus.CREATED) ;
 	}
 
-	public ResponseEntity<List<OrderResponseDTO>> getOrder(Long id, String name) {
+	public ResponseEntity<List<OrderResponseDTO>> getOrder(Long id, String goodsName, String receiverName) {
 		List<OrderResponseDTO> listOrderResponseDTO = new ArrayList<>();
-		
-		//Get All
-		if(id==null) {
-			List<Orders> listOrders= orderRepository.findAll();
-			
-			for(int i=0;i<listOrders.size();i++) {
-				OrderResponseDTO orderResponse = new OrderResponseDTO(listOrders.get(i));
-				listOrderResponseDTO.add(orderResponse);
-			}
-		}else if(name!=null) {//Get By Goods Name
-			Optional<Orders> order= orderRepository.findByGoodsName(name);
-			if(!order.isPresent()) {
-				return new ResponseEntity<>(listOrderResponseDTO, HttpStatus.NOT_FOUND) ;
-			}
-			
-			OrderResponseDTO orderResponse = new OrderResponseDTO(order.get());
-			listOrderResponseDTO.add(orderResponse);
-		}else { //Get By Id
+		if (id!=null){ //Find by Id
 			Optional<Orders> order= orderRepository.findById(id);
 			if(!order.isPresent()) {
 				return new ResponseEntity<>(listOrderResponseDTO, HttpStatus.NOT_FOUND) ;
 			}
-			
+
 			OrderResponseDTO orderResponse = new OrderResponseDTO(order.get());
 			listOrderResponseDTO.add(orderResponse);
+		}else{
+			//Generate Parameters
+			Map<String, Object> mapQuery = new HashMap<>();
+			String field="";
+			Object value;
+
+			//Add Parameter: Get By GoodsName
+			if (goodsName!=null){
+				field="goodsName";
+				value = goodsName;
+				mapQuery.put(field,value);
+			}
+
+			//Add Parameter: Get By ReceiverName
+			if (receiverName!=null) {
+				field = "receiverName";
+				value = receiverName;
+				mapQuery.put(field, value);
+			}
+
+			//Get Order from Paramter
+			//1. If field is not null get from dynamic query
+			//2. If field is null use default hibernate to get all orders
+			List<Orders> listOrders;
+			if (field!=""){ //Get from Dynamic Query
+				listOrders=orderRepositoryCustom.findOrderByDynamicField(mapQuery);
+			}else{ //Get All
+				listOrders= orderRepository.findAll();
+			}
+
+			//Check order is exist or not
+			if(listOrders==null || listOrders.size()==0) {
+				return new ResponseEntity<>(listOrderResponseDTO, HttpStatus.NOT_FOUND) ;
+			}
+
+			//Map List Orders to Response DTO
+			for(int i=0;i<listOrders.size();i++) {
+				OrderResponseDTO orderResponse = new OrderResponseDTO(listOrders.get(i));
+				listOrderResponseDTO.add(orderResponse);
+			}
 		}
-		
 		return new ResponseEntity<>(listOrderResponseDTO, HttpStatus.OK) ;
 	}
 
