@@ -16,13 +16,6 @@ public class OrderRepositoryCustom{
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Orders findOrderByDynamicField(String field, Object value) {
-        String queryString = "SELECT o FROM Orders o WHERE o." + field + " = :value";
-        TypedQuery<Orders> query = entityManager.createQuery(queryString, Orders.class);
-        query.setParameter("value", value);
-        return query.getSingleResult();
-    }
-
     public List<Orders> findOrderByDynamicField(Map<String, Object> mapQuery) {
         String queryString = "SELECT o FROM Orders o WHERE o.";
 
