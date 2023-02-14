@@ -1,5 +1,6 @@
 package com.coursenet.springbasic.controller;
 
+import com.coursenet.springbasic.dto.UserLoginResponseDTO;
 import com.coursenet.springbasic.dto.UserRequestDTO;
 import com.coursenet.springbasic.dto.UserResponseDTO;
 import com.coursenet.springbasic.service.UserService;
@@ -27,6 +28,19 @@ public class UserController {
             @RequestParam(value="name", required=false) String name
     ){
         return userService.getUsers(id,name);
+    }
 
+    //Register
+    @PostMapping("/users/registration")
+    public ResponseEntity<UserResponseDTO> userRegistration(@RequestBody UserRequestDTO userRequest){
+        log.info("User Registration Started: "+ userRequest.toString());
+        return userService.userRegistration(userRequest);
+    }
+
+    //Login
+    @PostMapping("/users/login")
+    public ResponseEntity<UserLoginResponseDTO> userLogin(@RequestBody UserRequestDTO userRequest){
+        log.info("User Login Started: "+userRequest.toString());
+        return userService.userLogin(userRequest);
     }
 }

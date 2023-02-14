@@ -25,7 +25,6 @@ public class Users {
     private LocalDateTime updatedAt;
 
     private String userName;
+    private String password;
     private String userEmail;
-
-
 }
