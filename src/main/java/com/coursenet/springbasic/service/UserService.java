@@ -2,6 +2,7 @@ package com.coursenet.springbasic.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.coursenet.springbasic.dto.OrderResponseDTO;
 import com.coursenet.springbasic.dto.UserLoginResponseDTO;
 import com.coursenet.springbasic.dto.UserRequestDTO;
@@ -9,6 +10,7 @@ import com.coursenet.springbasic.dto.UserResponseDTO;
 import com.coursenet.springbasic.entity.Orders;
 import com.coursenet.springbasic.entity.Users;
 import com.coursenet.springbasic.repository.UserRepository;
+import com.coursenet.springbasic.security.JWTUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,14 +36,8 @@ public class UserService {
     @Value("${salt.hash.password}")
     private String salt;
 
-    @Value("${jwt.token.secret}")
-    private String secret;
-
-    @Value("${jwt.token.issuer}")
-    private String issuer;
-
-    @Value("${jwt.token.accessValid}")
-    private int accessTokenValid;
+    @Autowired
+    private JWTUtil jwtUtil;
 
     public ResponseEntity<UserResponseDTO> createUser(UserRequestDTO userRequest){
         Users user = new Users();
@@ -115,20 +111,32 @@ public class UserService {
             return new ResponseEntity<>(new UserLoginResponseDTO(), HttpStatus.FORBIDDEN);
         }
 
-        LocalDateTime issuedLocalTime = LocalDateTime.now();
-        int valid = accessTokenValid;
+        String accessToken= jwtUtil.generateJWTToken(
+                user.get().getUserName(),"ACCESS");
 
-        String accessToken= JWT.create()
-                .withIssuer(issuer)
-                .withSubject(userRequest.getUserName())
-                .withIssuedAt(Date.from(issuedLocalTime.atZone(ZoneId.systemDefault()).toInstant()))
-                .withExpiresAt(Date.from(issuedLocalTime.plusSeconds(valid).atZone(ZoneId.systemDefault()).toInstant()))
-                .withClaim("type", "ACCESS")
-                .sign(Algorithm.HMAC256(secret));
+        String refreshToken= jwtUtil.generateJWTToken(
+                user.get().getUserName(),"REFRESH");
 
         UserLoginResponseDTO userLoginResponseDTO = new UserLoginResponseDTO();
         userLoginResponseDTO.setAccessToken(accessToken);
+        userLoginResponseDTO.setRefreshToken(refreshToken);
 
         return new ResponseEntity<>(userLoginResponseDTO, HttpStatus.OK);
+    }
+
+    public ResponseEntity<UserLoginResponseDTO> refreshToken(String refreshToken) {
+        DecodedJWT decodedJWT = jwtUtil.verifyJWTToken(refreshToken);
+        if (decodedJWT.getClaim("type").asString().equals("REFRESH")){
+            String accessToken= jwtUtil.generateJWTToken(
+                    decodedJWT.getSubject(),"ACCESS");
+
+            UserLoginResponseDTO userLoginResponseDTO = new UserLoginResponseDTO();
+            userLoginResponseDTO.setAccessToken(accessToken);
+            userLoginResponseDTO.setRefreshToken(refreshToken);
+
+            return new ResponseEntity<>(userLoginResponseDTO, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new UserLoginResponseDTO(), HttpStatus.FORBIDDEN);
     }
 }

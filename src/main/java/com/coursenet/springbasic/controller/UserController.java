@@ -43,4 +43,12 @@ public class UserController {
         log.info("User Login Started: "+userRequest.toString());
         return userService.userLogin(userRequest);
     }
+
+    //Login
+    @PostMapping("/users/refresh-token")
+    public ResponseEntity<UserLoginResponseDTO> refreshToken(
+            @RequestHeader("Authorization") String refreshToken){
+        log.info("Refresh Token Started: "+refreshToken);
+        return userService.refreshToken(refreshToken);
+    }
 }
