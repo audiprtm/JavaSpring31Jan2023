@@ -1,16 +1,13 @@
 package com.coursenet.springbasic.service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.coursenet.springbasic.dto.OrderResponseDTO;
 import com.coursenet.springbasic.dto.UserLoginResponseDTO;
 import com.coursenet.springbasic.dto.UserRequestDTO;
 import com.coursenet.springbasic.dto.UserResponseDTO;
-import com.coursenet.springbasic.entity.Orders;
 import com.coursenet.springbasic.entity.Users;
 import com.coursenet.springbasic.repository.UserRepository;
 import com.coursenet.springbasic.security.JWTUtil;
+import com.coursenet.springbasic.security.TokenConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,10 +106,10 @@ public class UserService {
         }
 
         String accessToken= jwtUtil.generateJWTToken(
-                user.get().getUserName(),"ACCESS");
+                user.get().getUserName(), TokenConstants.TOKEN_ACCESS);
 
         String refreshToken= jwtUtil.generateJWTToken(
-                user.get().getUserName(),"REFRESH");
+                user.get().getUserName(),TokenConstants.TOKEN_REFRESH);
 
         UserLoginResponseDTO userLoginResponseDTO = new UserLoginResponseDTO();
         userLoginResponseDTO.setAccessToken(accessToken);

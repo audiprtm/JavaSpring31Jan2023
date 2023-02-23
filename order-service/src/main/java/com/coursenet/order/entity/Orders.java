@@ -1,15 +1,14 @@
-package com.coursenet.springbasic.entity;
+package com.coursenet.order.entity;
 
-import java.time.LocalDateTime;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -27,4 +26,7 @@ public class Orders {
 	private String goodsName;
 	private String receiverName;
 	private String receiverAddress;
+	private String status;
+	private String invoice;
+	private int shipperId;
 }

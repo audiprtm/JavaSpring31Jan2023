@@ -1,13 +1,11 @@
-package com.coursenet.springbasic;
+package com.coursenet.order;
 
-import com.coursenet.springbasic.dto.OrderRequestDTO;
-import com.coursenet.springbasic.dto.OrderResponseDTO;
-import com.coursenet.springbasic.entity.Orders;
-import com.coursenet.springbasic.repository.OrderRepository;
-import com.coursenet.springbasic.repository.OrderRepositoryCustom;
-import com.coursenet.springbasic.service.OrderService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
+import com.coursenet.order.dto.OrderRequestDTO;
+import com.coursenet.order.dto.OrderResponseDTO;
+import com.coursenet.order.entity.Orders;
+import com.coursenet.order.repository.OrderRepository;
+import com.coursenet.order.repository.OrderRepositoryCustom;
+import com.coursenet.order.service.OrderService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -19,9 +17,9 @@ import org.springframework.http.ResponseEntity;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest
 public class OrderServiceTests {
     @InjectMocks

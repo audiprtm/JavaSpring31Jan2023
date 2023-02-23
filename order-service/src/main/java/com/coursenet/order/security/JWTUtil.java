@@ -1,4 +1,4 @@
-package com.coursenet.springbasic.security;
+package com.coursenet.order.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

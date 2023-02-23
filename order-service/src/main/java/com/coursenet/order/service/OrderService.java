@@ -1,17 +1,20 @@
-package com.coursenet.springbasic.service;
+package com.coursenet.order.service;
 
-import java.util.*;
-
-import com.coursenet.springbasic.repository.OrderRepositoryCustom;
+import com.coursenet.order.constants.OrderStatusConstants;
+import com.coursenet.order.dto.OrderRequestDTO;
+import com.coursenet.order.dto.OrderResponseDTO;
+import com.coursenet.order.dto.OrderStatusRequestDTO;
+import com.coursenet.order.entity.Orders;
+import com.coursenet.order.repository.OrderRepository;
+import com.coursenet.order.repository.OrderRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.coursenet.springbasic.dto.OrderRequestDTO;
-import com.coursenet.springbasic.dto.OrderResponseDTO;
-import com.coursenet.springbasic.entity.Orders;
-import com.coursenet.springbasic.repository.OrderRepository;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -22,10 +25,16 @@ public class OrderService {
 	private OrderRepositoryCustom orderRepositoryCustom;
 	
 	public ResponseEntity<OrderResponseDTO> createOrder(OrderRequestDTO orderRequest) {
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
+		String stringDate = dateFormat.format(new Date());
+
 		Orders order = new Orders();
 		order.setGoodsName(orderRequest.getGoodsName());
 		order.setReceiverAddress(orderRequest.getReceiverAddress());
 		order.setReceiverName(orderRequest.getReceiverName());
+		order.setStatus(OrderStatusConstants.ORDER_CREATED);
+		order.setShipperId(orderRequest.getShipperId());
+		order.setInvoice("INVOICE/"+stringDate);
 		
 		order = orderRepository.save(order);
 		
@@ -127,5 +136,43 @@ public class OrderService {
 		//Delete
 		orderRepository.deleteById(id);
 		return new ResponseEntity<>(new OrderResponseDTO(), HttpStatus.NO_CONTENT);
+	}
+
+	public ResponseEntity<OrderResponseDTO> updateStatusOrder(OrderStatusRequestDTO orderRequest) {
+		//Cari id nya ada atau engga
+		Optional<Orders> order = orderRepository.findById(orderRequest.getId());
+		if (!order.isPresent()){
+			return new ResponseEntity<>(new OrderResponseDTO(), HttpStatus.NOT_FOUND) ;
+		}
+
+		Orders updateOrder=order.get();
+		switch (orderRequest.getStatus()){
+			case OrderStatusConstants.ORDER_INPROCESS:
+				return processOrder(updateOrder);
+			case OrderStatusConstants.ORDER_FINISHED:
+				return finishOrder(updateOrder);
+			case OrderStatusConstants.ORDER_CANCELLED:
+				return cancelOrder(updateOrder);
+			default:
+				return new ResponseEntity<>(new OrderResponseDTO(), HttpStatus.BAD_REQUEST) ;
+		}
+	}
+
+	private ResponseEntity<OrderResponseDTO> finishOrder(Orders updateOrder) {
+		updateOrder.setStatus(OrderStatusConstants.ORDER_FINISHED);
+		updateOrder = orderRepository.save(updateOrder);
+		return new ResponseEntity<>(new OrderResponseDTO(updateOrder), HttpStatus.OK) ;
+	}
+
+	private ResponseEntity<OrderResponseDTO> cancelOrder(Orders updateOrder) {
+		updateOrder.setStatus(OrderStatusConstants.ORDER_CANCELLED);
+		updateOrder = orderRepository.save(updateOrder);
+		return new ResponseEntity<>(new OrderResponseDTO(updateOrder), HttpStatus.OK) ;
+	}
+
+	private ResponseEntity<OrderResponseDTO> processOrder(Orders updateOrder) {
+		updateOrder.setStatus(OrderStatusConstants.ORDER_INPROCESS);
+		updateOrder = orderRepository.save(updateOrder);
+		return new ResponseEntity<>(new OrderResponseDTO(updateOrder), HttpStatus.OK) ;
 	}
 }

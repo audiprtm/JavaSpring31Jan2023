@@ -1,4 +1,4 @@
-package com.coursenet.springbasic.security;
+package com.coursenet.order.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;

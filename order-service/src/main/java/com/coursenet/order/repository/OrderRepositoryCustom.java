@@ -1,6 +1,6 @@
-package com.coursenet.springbasic.repository;
+package com.coursenet.order.repository;
 
-import com.coursenet.springbasic.entity.Orders;
+import com.coursenet.order.entity.Orders;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;

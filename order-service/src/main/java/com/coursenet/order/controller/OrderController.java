@@ -1,15 +1,16 @@
-package com.coursenet.springbasic.controller;
+package com.coursenet.order.controller;
 
-import java.util.List;
-
+import com.coursenet.order.dto.OrderRequestDTO;
+import com.coursenet.order.dto.OrderResponseDTO;
+import com.coursenet.order.dto.OrderStatusRequestDTO;
+import com.coursenet.order.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.coursenet.springbasic.dto.OrderRequestDTO;
-import com.coursenet.springbasic.dto.OrderResponseDTO;
-import com.coursenet.springbasic.service.OrderService;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -18,9 +19,15 @@ public class OrderController {
 	private OrderService orderService;
 	
 	@PostMapping("/orders")
-	public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequest){
-		log.info(orderRequest.toString());
+	public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody @Valid OrderRequestDTO orderRequest){
+		log.info("Create Order Started: "+ orderRequest.toString());
 		return orderService.createOrder(orderRequest);
+	}
+
+	@PostMapping("/orders/update-status")
+	public ResponseEntity<OrderResponseDTO> updateStatusOrder(@RequestBody @Valid OrderStatusRequestDTO orderRequest){
+		log.info("Update Status Order Started: "+orderRequest.toString());
+		return orderService.updateStatusOrder(orderRequest);
 	}
 	
 	@GetMapping("/orders")
@@ -35,7 +42,7 @@ public class OrderController {
 	@PutMapping("/orders/{id}")
 	public ResponseEntity<OrderResponseDTO> putOrders(
 			@PathVariable(value="id") Long id,
-			@RequestBody OrderRequestDTO orderRequestDTO
+			@RequestBody @Valid OrderRequestDTO orderRequestDTO
 	){
 		return orderService.putOrder(id,orderRequestDTO);
 	}
