@@ -1,6 +1,8 @@
 package com.coursenet.order.service;
 
+import com.coursenet.order.client.DeliveryServiceClient;
 import com.coursenet.order.constants.OrderStatusConstants;
+import com.coursenet.order.dto.DeliveryRequestDTO;
 import com.coursenet.order.dto.OrderRequestDTO;
 import com.coursenet.order.dto.OrderResponseDTO;
 import com.coursenet.order.dto.OrderStatusRequestDTO;
@@ -23,6 +25,9 @@ public class OrderService {
 
 	@Autowired
 	private OrderRepositoryCustom orderRepositoryCustom;
+
+	@Autowired
+	private DeliveryServiceClient deliveryServiceClient;
 	
 	public ResponseEntity<OrderResponseDTO> createOrder(OrderRequestDTO orderRequest) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
@@ -171,6 +176,17 @@ public class OrderService {
 	}
 
 	private ResponseEntity<OrderResponseDTO> processOrder(Orders updateOrder) {
+		//Build Delivery RequestDTO
+		DeliveryRequestDTO deliveryRequestDTO = new DeliveryRequestDTO();
+		deliveryRequestDTO.setOrderId(updateOrder.getId());
+		deliveryRequestDTO.setReceiverAddress(updateOrder.getReceiverAddress());
+		deliveryRequestDTO.setShipperId(updateOrder.getShipperId());
+		deliveryRequestDTO.setInvoice(updateOrder.getInvoice());
+
+		//Tembak Create Delivery
+		deliveryServiceClient.createDelivery(deliveryRequestDTO);
+
+		//Update Status Order
 		updateOrder.setStatus(OrderStatusConstants.ORDER_INPROCESS);
 		updateOrder = orderRepository.save(updateOrder);
 		return new ResponseEntity<>(new OrderResponseDTO(updateOrder), HttpStatus.OK) ;

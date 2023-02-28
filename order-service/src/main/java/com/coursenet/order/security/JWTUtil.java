@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -26,21 +27,14 @@ public class JWTUtil {
     @Autowired
     private Algorithm algorithm;
 
-    public DecodedJWT verifyJWTToken(String token){
-        JWTVerifier verifier =JWT.require(algorithm).build();
+    public DecodedJWT verifyJWTToken(String token) {
+        JWTVerifier verifier = JWT.require(algorithm).build();
         return verifier.verify(token.replace("Bearer ", ""));
     }
 
-    public String generateJWTToken(String userName, String type){
-        LocalDateTime issuedLocalTime = LocalDateTime.now();
-        int valid = type.equals(TokenConstants.TOKEN_ACCESS) ? accessTokenValid : refreshTokenValid;
-
-        return JWT.create()
-                .withIssuer(issuer)
-                .withSubject(userName)
-                .withIssuedAt(Date.from(issuedLocalTime.atZone(ZoneId.systemDefault()).toInstant()))
-                .withExpiresAt(Date.from(issuedLocalTime.plusSeconds(valid).atZone(ZoneId.systemDefault()).toInstant()))
-                .withClaim("type", type)
-                .sign(algorithm);
+    public String getCurrentToken() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        DecodedJWT decodedJWT = principal instanceof DecodedJWT ? (DecodedJWT) principal :null;
+        return decodedJWT.getToken();
     }
 }
